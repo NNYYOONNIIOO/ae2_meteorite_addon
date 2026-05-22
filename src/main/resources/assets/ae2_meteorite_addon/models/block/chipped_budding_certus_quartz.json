@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "ae2_meteorite_addon:blocks/chipped_budding_certus_quartz"
+  }
+}

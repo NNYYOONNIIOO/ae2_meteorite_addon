@@ -1,0 +1,6 @@
+{
+  "parent": "block/cross",
+  "textures": {
+    "cross": "ae2_meteorite_addon:blocks/large_certus_quartz_bud"
+  }
+}

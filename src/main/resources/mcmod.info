@@ -1,0 +1,29 @@
+﻿﻿﻿﻿﻿﻿[
+{
+  "modid": "ae2_meteorite_addon",
+  "name": "AE2陨石附加",
+  "description": "AE2 Meteorite Addon",
+  "version": "1.0",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["nyonio"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": [
+    {
+      "modid": "appliedenergistics2",
+      "mandatory": true,
+      "version": "*",
+      "side": "BOTH"
+    },
+    {
+      "modid": "mixinbooter",
+      "mandatory": true,
+      "version": "10.0",
+      "side": "BOTH"
+    }
+  ]
+}
+]

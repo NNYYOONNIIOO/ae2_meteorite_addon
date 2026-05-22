@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.ae2_meteorite_addon.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinPartAnnihilationPlane",
+    "MixinTileQuartzGrowthAccelerator",
+    "MixinMeteoritePlacer"
+  ],
+  "client": [],
+  "server": [],
+  "minVersion": "0.8"
+}

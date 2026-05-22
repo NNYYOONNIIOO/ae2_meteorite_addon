@@ -1,0 +1,6 @@
+{
+  "parent": "block/cross",
+  "textures": {
+    "cross": "ae2_meteorite_addon:blocks/certus_quartz_cluster"
+  }
+}
