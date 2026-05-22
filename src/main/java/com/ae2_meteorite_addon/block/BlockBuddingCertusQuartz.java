@@ -6,6 +6,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.init.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -80,17 +82,68 @@ public class BlockBuddingCertusQuartz extends Block {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        if (this == ModBlocks.FLAWLESS_BUDDING_CERTUS_QUARTZ) {
+            return Item.getItemFromBlock(ModBlocks.FLAWED_BUDDING_CERTUS_QUARTZ);
+        }
+        Block degraded = getDegradedBlock();
+        if (degraded != null) {
+            return Item.getItemFromBlock(degraded);
+        }
         return AEApi.instance().definitions().blocks().quartzBlock().maybeItem().orElse(null);
     }
 
     @Override
     public int damageDropped(IBlockState state) {
+        if (this == ModBlocks.FLAWLESS_BUDDING_CERTUS_QUARTZ) {
+            return 0;
+        }
+        Block degraded = getDegradedBlock();
+        if (degraded != null) {
+            return 0;
+        }
         return AEApi.instance().definitions().blocks().quartzBlock().maybeStack(1)
                 .map(ItemStack::getMetadata).orElse(0);
     }
 
     @Override
     public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, net.minecraft.entity.player.EntityPlayer player) {
-        return false;
+        if (this == ModBlocks.FLAWLESS_BUDDING_CERTUS_QUARTZ) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void dropBlockAsItemWithChance(World world, BlockPos pos, IBlockState state, float chance, int fortune) {
+        if (world.isRemote) {
+            return;
+        }
+
+        if (this == ModBlocks.FLAWLESS_BUDDING_CERTUS_QUARTZ) {
+            spawnAsEntity(world, pos, new ItemStack(ModBlocks.FLAWED_BUDDING_CERTUS_QUARTZ));
+            return;
+        }
+
+        net.minecraft.entity.player.EntityPlayer player = net.minecraftforge.common.ForgeHooks
+                .getCraftingPlayer();
+        boolean hasSilkTouch = false;
+        if (player != null) {
+            ItemStack heldItem = player.getHeldItemMainhand();
+            hasSilkTouch = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, heldItem) > 0;
+        }
+
+        if (hasSilkTouch) {
+            spawnAsEntity(world, pos, new ItemStack(this));
+        } else {
+            Block degraded = getDegradedBlock();
+            if (degraded != null) {
+                spawnAsEntity(world, pos, new ItemStack(degraded));
+            }
+        }
+    }
+
+    @Override
+    public net.minecraft.block.material.EnumPushReaction getMobilityFlag(IBlockState state) {
+        return net.minecraft.block.material.EnumPushReaction.DESTROY;
     }
 }
