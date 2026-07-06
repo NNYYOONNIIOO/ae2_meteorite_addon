@@ -3,8 +3,8 @@ package com.ae2_meteorite_addon.mixin;
 import appeng.api.AEApi;
 import appeng.worldgen.MeteoritePlacer;
 import appeng.worldgen.meteorite.IMeteoriteWorld;
-import com.ae2_meteorite_addon.ModBlocks;
 import com.ae2_meteorite_addon.ModConfig;
+import com.ae2_meteorite_addon.config.JsonConfigManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @Mixin(value = MeteoritePlacer.class, remap = false)
@@ -27,26 +26,6 @@ public class MixinMeteoritePlacer {
 
     @Shadow(remap = false)
     private NBTTagCompound settings;
-
-    @Unique
-    private static final Block[] ae2_meteorite_addon$BUDDING_BLOCKS = new Block[5];
-
-    @Unique
-    private static boolean ae2_meteorite_addon$initialized = false;
-
-    @Unique
-    private void ae2_meteorite_addon$initBuddingBlocks() {
-        if (ae2_meteorite_addon$initialized) return;
-        ae2_meteorite_addon$initialized = true;
-
-        ae2_meteorite_addon$BUDDING_BLOCKS[0] = ModBlocks.FLAWLESS_BUDDING_CERTUS_QUARTZ;
-        ae2_meteorite_addon$BUDDING_BLOCKS[1] = ModBlocks.FLAWED_BUDDING_CERTUS_QUARTZ;
-        ae2_meteorite_addon$BUDDING_BLOCKS[2] = ModBlocks.CHIPPED_BUDDING_CERTUS_QUARTZ;
-        ae2_meteorite_addon$BUDDING_BLOCKS[3] = ModBlocks.DAMAGED_BUDDING_CERTUS_QUARTZ;
-
-        Optional<Block> quartzBlock = AEApi.instance().definitions().blocks().quartzBlock().maybeBlock();
-        ae2_meteorite_addon$BUDDING_BLOCKS[4] = quartzBlock.orElse(ModBlocks.DAMAGED_BUDDING_CERTUS_QUARTZ);
-    }
 
     @Inject(method = "spawnMeteorite(Lappeng/worldgen/meteorite/IMeteoriteWorld;III)Z",
             at = @At(value = "INVOKE",
@@ -75,7 +54,14 @@ public class MixinMeteoritePlacer {
     private void ae2_meteorite_addon$placeBuddingBlocks(IMeteoriteWorld w, int x, int y, int z) {
         if (!ModConfig.enableMeteoriteBudding) return;
 
-        ae2_meteorite_addon$initBuddingBlocks();
+        List<IBlockState> buddingStates = JsonConfigManager.getMeteoriteBuddingBlocks();
+        if (buddingStates.isEmpty()) return;
+
+        // Also add the AE2 quartz block as a possible spawn
+        List<IBlockState> allOptions = new ArrayList<>(buddingStates);
+        AEApi.instance().definitions().blocks().quartzBlock().maybeBlock().ifPresent(qb -> {
+            allOptions.add(qb.getDefaultState());
+        });
 
         Random random = w.getWorld().rand;
 
@@ -100,9 +86,8 @@ public class MixinMeteoritePlacer {
         int count = Math.min(9, validPositions.size());
         for (int i = 0; i < count; i++) {
             int[] pos = validPositions.get(i);
-            Block buddingBlock = ae2_meteorite_addon$BUDDING_BLOCKS[random.nextInt(ae2_meteorite_addon$BUDDING_BLOCKS.length)];
-            IBlockState buddingState = buddingBlock.getDefaultState();
-            w.setBlock(pos[0], pos[1], pos[2], buddingState, 3);
+            IBlockState chosen = allOptions.get(random.nextInt(allOptions.size()));
+            w.setBlock(pos[0], pos[1], pos[2], chosen, 3);
         }
     }
 }

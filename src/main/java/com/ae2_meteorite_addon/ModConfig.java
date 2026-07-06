@@ -11,6 +11,7 @@ public class ModConfig {
     public static boolean enableMeteoriteDust = true;
     public static int meteoriteDustIntervalSeconds = 10;
     public static boolean enableMeteoriteBudding = true;
+    public static int growthAcceleratorSpeed = 10;
 
     public static void init(File configFile) {
         config = new Configuration(configFile);
@@ -36,6 +37,13 @@ public class ModConfig {
                 Configuration.CATEGORY_GENERAL,
                 true,
                 "Enable budding certus quartz blocks generating in meteorites"
+        );
+        growthAcceleratorSpeed = config.getInt(
+                "growthAcceleratorSpeed",
+                Configuration.CATEGORY_GENERAL,
+                10,
+                1, 100,
+                "Number of ticks between two growth accelerator ticks for budding certus quartz"
         );
         if (config.hasChanged()) {
             config.save();

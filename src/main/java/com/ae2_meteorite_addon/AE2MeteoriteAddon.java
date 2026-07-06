@@ -1,6 +1,6 @@
 package com.ae2_meteorite_addon;
 
-import com.ae2_meteorite_addon.ModConfig;
+import com.ae2_meteorite_addon.config.JsonConfigManager;
 import com.ae2_meteorite_addon.entity.EntityBuddingRepair;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
@@ -9,6 +9,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import org.apache.logging.log4j.Logger;
+
+import java.io.File;
 
 @Mod(modid = AE2MeteoriteAddon.MODID, name = AE2MeteoriteAddon.NAME, version = AE2MeteoriteAddon.VERSION,
         dependencies = "required-after:appliedenergistics2;required-after:mixinbooter@[10.0,)")
@@ -27,7 +29,18 @@ public class AE2MeteoriteAddon
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
-        ModConfig.init(event.getSuggestedConfigurationFile());
+
+        // Move config to subfolder
+        File configDir = event.getSuggestedConfigurationFile().getParentFile();
+        File subDir = new File(configDir, MODID);
+        subDir.mkdirs();
+        ModConfig.init(new File(subDir, MODID + ".cfg"));
+
+        // Load JSON configs
+        JsonConfigManager.load(configDir);
+
+        // Create dynamic blocks from JSON configs
+        DynamicBlockRegistry.createBlocks();
 
         EntityRegistry.registerModEntity(
                 new ResourceLocation(MODID, "budding_repair"),
@@ -43,5 +56,9 @@ public class AE2MeteoriteAddon
     public void init(FMLInitializationEvent event)
     {
         logger.info("{} initialized!", NAME);
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 }

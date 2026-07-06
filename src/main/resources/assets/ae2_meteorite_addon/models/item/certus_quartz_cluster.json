@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "ae2_meteorite_addon:blocks/certus_quartz_cluster"
-  }
-}

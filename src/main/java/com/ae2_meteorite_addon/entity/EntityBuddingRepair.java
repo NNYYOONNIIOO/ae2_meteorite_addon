@@ -1,7 +1,10 @@
 package com.ae2_meteorite_addon.entity;
 
 import appeng.api.AEApi;
-import com.ae2_meteorite_addon.ModBlocks;
+import com.ae2_meteorite_addon.block.BlockBuddingGeneric;
+import com.ae2_meteorite_addon.block.BlockBudGeneric;
+import com.ae2_meteorite_addon.config.BuddingEntry;
+import com.ae2_meteorite_addon.config.JsonConfigManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -104,18 +107,26 @@ public class EntityBuddingRepair extends EntityItem {
         }
 
         Block block = ((ItemBlock) input.getItem()).getBlock();
+        int meta = input.getMetadata();
 
+        // Check AE2 quartz block -> damaged budding (highest variant)
         Optional<Block> quartzBlock = AEApi.instance().definitions().blocks().quartzBlock().maybeBlock();
         if (quartzBlock.isPresent() && block == quartzBlock.get()) {
-            return new ItemStack(ModBlocks.DAMAGED_BUDDING_CERTUS_QUARTZ);
+            for (BuddingEntry entry : JsonConfigManager.getBuddingEntries()) {
+                if ("block".equals(entry.type)) {
+                    Block buddingBlock = JsonConfigManager.getBuddingBlock("ae2_meteorite_addon:" + entry.name);
+                    if (buddingBlock != null) {
+                        return new ItemStack(buddingBlock, 1, entry.metaCount - 1);
+                    }
+                }
+            }
         }
 
-        if (block == ModBlocks.DAMAGED_BUDDING_CERTUS_QUARTZ) {
-            return new ItemStack(ModBlocks.CHIPPED_BUDDING_CERTUS_QUARTZ);
-        }
-
-        if (block == ModBlocks.CHIPPED_BUDDING_CERTUS_QUARTZ) {
-            return new ItemStack(ModBlocks.FLAWED_BUDDING_CERTUS_QUARTZ);
+        // Check budding block -> upgrade one level (lower variant = better)
+        if (block instanceof BlockBuddingGeneric) {
+            if (meta > 0) {
+                return new ItemStack(block, 1, meta - 1);
+            }
         }
 
         return null;

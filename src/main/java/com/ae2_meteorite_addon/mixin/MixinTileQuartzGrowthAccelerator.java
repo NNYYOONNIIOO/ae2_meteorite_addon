@@ -2,7 +2,9 @@ package com.ae2_meteorite_addon.mixin;
 
 import appeng.api.implementations.tiles.ICrystalGrowthAccelerator;
 import appeng.tile.misc.TileQuartzGrowthAccelerator;
-import com.ae2_meteorite_addon.block.BlockBuddingCertusQuartz;
+import com.ae2_meteorite_addon.ModConfig;
+import com.ae2_meteorite_addon.block.BlockBuddingGeneric;
+import com.ae2_meteorite_addon.config.JsonConfigManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
@@ -14,15 +16,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Random;
+import java.util.Set;
 
 @Mixin(value = TileQuartzGrowthAccelerator.class, remap = false)
 public abstract class MixinTileQuartzGrowthAccelerator extends TileEntity implements ICrystalGrowthAccelerator, ITickable {
 
     @Unique
     private int ae2_meteorite_addon$tickCounter = 0;
-
-    @Unique
-    private static final int ae2_meteorite_addon$ACCELERATE_INTERVAL = 40;
 
     @Override
     public void update() {
@@ -41,20 +41,21 @@ public abstract class MixinTileQuartzGrowthAccelerator extends TileEntity implem
         }
 
         ae2_meteorite_addon$tickCounter++;
-        if (ae2_meteorite_addon$tickCounter < ae2_meteorite_addon$ACCELERATE_INTERVAL) {
+        if (ae2_meteorite_addon$tickCounter < ModConfig.growthAcceleratorSpeed) {
             return;
         }
         ae2_meteorite_addon$tickCounter = 0;
 
         BlockPos pos = this.getPos();
         Random random = world.rand;
+        Set<Block> acceleratable = JsonConfigManager.getAcceleratableBuddingBlocks();
 
         for (EnumFacing facing : EnumFacing.values()) {
             BlockPos adjacentPos = pos.offset(facing);
             IBlockState adjacentState = world.getBlockState(adjacentPos);
             Block adjacentBlock = adjacentState.getBlock();
 
-            if (adjacentBlock instanceof BlockBuddingCertusQuartz) {
+            if (acceleratable.contains(adjacentBlock)) {
                 adjacentBlock.randomTick(world, adjacentPos, adjacentState, random);
             }
         }

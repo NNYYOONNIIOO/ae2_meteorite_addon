@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: ae2_meteorite_addon
+MixinConfigs: ae2_meteorite_addon.mixins.json
+Implementation-Version: 1.0
+Specification-Vendor: ae2_meteorite_addon
+Specification-Title: ae2_meteorite_addon
+Implementation-Timestamp: 2026-05-21T20:48:58+0800
+Specification-Version: 1
+Implementation-Vendor: ae2_meteorite_addon
+

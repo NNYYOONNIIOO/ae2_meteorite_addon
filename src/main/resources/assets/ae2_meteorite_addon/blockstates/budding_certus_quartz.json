@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "variant=0": { "model": "ae2_meteorite_addon:budding_certus_quartz_0" },
+    "variant=1": { "model": "ae2_meteorite_addon:budding_certus_quartz_1" },
+    "variant=2": { "model": "ae2_meteorite_addon:budding_certus_quartz_2" },
+    "variant=3": { "model": "ae2_meteorite_addon:budding_certus_quartz_3" }
+  }
+}

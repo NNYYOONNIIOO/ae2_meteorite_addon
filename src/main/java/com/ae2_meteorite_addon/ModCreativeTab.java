@@ -13,6 +13,10 @@ public class ModCreativeTab extends CreativeTabs {
 
     @Override
     public ItemStack getTabIconItem() {
-        return new ItemStack(ModBlocks.FLAWLESS_BUDDING_CERTUS_QUARTZ);
+        // Use first budding block variant 0
+        if (!DynamicBlockRegistry.getAllBlocks().isEmpty()) {
+            return new ItemStack(DynamicBlockRegistry.getAllBlocks().get(0), 1, 0);
+        }
+        return ItemStack.EMPTY;
     }
 }
