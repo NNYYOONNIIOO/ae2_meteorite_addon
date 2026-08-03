@@ -104,9 +104,8 @@ public class JsonConfigManager {
 
                 JsonObject object = element.getAsJsonObject();
                 if (object.has("acceleratable")) {
-                    LOGGER.warn("Skipping spawn.json entry {} because it contains the removed 'acceleratable' field", index);
-                    index++;
-                    continue;
+                    LOGGER.warn("Ignoring the removed 'acceleratable' field in spawn.json entry {}", index);
+                    object.remove("acceleratable");
                 }
 
                 SpawnEntry entry = GSON.fromJson(object, SpawnEntry.class);
