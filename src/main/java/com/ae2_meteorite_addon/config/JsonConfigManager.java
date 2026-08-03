@@ -30,6 +30,7 @@ public class JsonConfigManager {
     private static List<SpawnEntry> spawnEntries = new ArrayList<>();
     private static List<DegenerateEntry> degenerateEntries = new ArrayList<>();
     private static List<DropEntry> dropEntries = new ArrayList<>();
+    private static List<FixEntry> fixEntries = new ArrayList<>();
 
     // Runtime lookup maps
     // budding: baseName (ae2_meteorite_addon:budding_certus_quartz) -> Block
@@ -54,6 +55,8 @@ public class JsonConfigManager {
                 new TypeToken<List<DegenerateEntry>>(){}.getType(), getDefaultDegenerateJson());
         dropEntries = loadJson(new File(subDir, "drop.json"),
                 new TypeToken<List<DropEntry>>(){}.getType(), getDefaultDropJson());
+        fixEntries = loadJson(new File(subDir, "fix.json"),
+                new TypeToken<List<FixEntry>>(){}.getType(), getDefaultFixJson());
     }
 
     private static <T> List<T> loadJson(File file, Type type, String defaultJson) {
@@ -155,6 +158,10 @@ public class JsonConfigManager {
 
     public static List<DropEntry> getDropEntries() {
         return dropEntries;
+    }
+
+    public static List<FixEntry> getFixEntries() {
+        return fixEntries;
     }
 
     /**
@@ -445,6 +452,38 @@ public class JsonConfigManager {
                 "    \"item\": \"appliedenergistics2:material:0\",\n" +
                 "    \"count\": 4,\n" +
                 "    \"fortuneBonus\": true\n" +
+                "  }\n" +
+                "]\n";
+    }
+
+    private static String getDefaultFixJson() {
+        return "[\n" +
+                "  {\n" +
+                "    \"inputs\": [\n" +
+                "      \"appliedenergistics2:material:1\",\n" +
+                "      \"appliedenergistics2:quartz_block:0\"\n" +
+                "    ],\n" +
+                "    \"fluid\": \"minecraft:water\",\n" +
+                "    \"consumeFluid\": false,\n" +
+                "    \"output\": \"ae2_meteorite_addon:budding_certus_quartz:3\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"inputs\": [\n" +
+                "      \"appliedenergistics2:material:1\",\n" +
+                "      \"ae2_meteorite_addon:budding_certus_quartz:3\"\n" +
+                "    ],\n" +
+                "    \"fluid\": \"minecraft:water\",\n" +
+                "    \"consumeFluid\": false,\n" +
+                "    \"output\": \"ae2_meteorite_addon:budding_certus_quartz:2\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"inputs\": [\n" +
+                "      \"appliedenergistics2:material:1\",\n" +
+                "      \"ae2_meteorite_addon:budding_certus_quartz:2\"\n" +
+                "    ],\n" +
+                "    \"fluid\": \"minecraft:water\",\n" +
+                "    \"consumeFluid\": false,\n" +
+                "    \"output\": \"ae2_meteorite_addon:budding_certus_quartz:1\"\n" +
                 "  }\n" +
                 "]\n";
     }

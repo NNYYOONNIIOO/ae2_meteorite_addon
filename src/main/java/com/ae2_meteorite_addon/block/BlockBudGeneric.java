@@ -137,6 +137,14 @@ public class BlockBudGeneric extends Block {
     }
 
     @Override
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+        ItemStack drop = JsonConfigManager.getBudDrop(this, fortune);
+        if (!drop.isEmpty()) {
+            drops.add(drop);
+        }
+    }
+
+    @Override
     public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
         return false;
     }

@@ -1,13 +1,10 @@
 package com.ae2_meteorite_addon;
 
 import com.ae2_meteorite_addon.config.JsonConfigManager;
-import com.ae2_meteorite_addon.entity.EntityBuddingRepair;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -42,14 +39,10 @@ public class AE2MeteoriteAddon
         // Create dynamic blocks from JSON configs
         DynamicBlockRegistry.createBlocks();
 
-        EntityRegistry.registerModEntity(
-                new ResourceLocation(MODID, "budding_repair"),
-                EntityBuddingRepair.class,
-                "budding_repair",
-                0,
-                INSTANCE,
-                64, 4, true
-        );
+        // Force-load ModEventHandler to register its @SubscribeEvent methods
+        // (@Mod.EventBusSubscriber only works if the class is loaded)
+        Class<?> handler = ModEventHandler.class;
+        logger.info("Loaded event handler: {}", handler.getName());
     }
 
     @EventHandler

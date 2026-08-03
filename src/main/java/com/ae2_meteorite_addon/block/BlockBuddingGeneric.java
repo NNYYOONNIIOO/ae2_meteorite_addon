@@ -21,6 +21,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import java.util.Random;
@@ -168,6 +169,32 @@ public class BlockBuddingGeneric extends Block {
                 spawnAsEntity(world, pos, new ItemStack(this, 1, variant));
             }
         }
+    }
+
+    @Override
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+        int variant = state.getValue(VARIANT);
+
+        // Flawless (variant 0) always drops variant 1 (flawed)
+        if (variant == 0) {
+            drops.add(new ItemStack(this, 1, 1));
+            return;
+        }
+
+        // Non-player break: drop degraded version (no silk touch)
+        DegenerateEntry entry = JsonConfigManager.getDegenerateEntry(this, variant);
+        if (entry != null && !entry.source.equals(entry.target)) {
+            IBlockState targetState = JsonConfigManager.parseBlockState(entry.target);
+            if (targetState != null) {
+                Block targetBlock = targetState.getBlock();
+                int targetMeta = targetBlock.getMetaFromState(targetState);
+                drops.add(new ItemStack(targetBlock, 1, targetMeta));
+                return;
+            }
+        }
+
+        // No degradation rule, drop itself
+        drops.add(new ItemStack(this, 1, variant));
     }
 
     @Override
