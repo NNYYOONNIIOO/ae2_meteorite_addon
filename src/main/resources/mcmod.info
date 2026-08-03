@@ -3,7 +3,7 @@
   "modid": "ae2_meteorite_addon",
   "name": "AE2 Meteorite Addon",
   "description": "AE2 Meteorite Addon",
-  "version": "1.4",
+  "version": "1.5",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",

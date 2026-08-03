@@ -15,7 +15,7 @@ public class AE2MeteoriteAddon
 {
     public static final String MODID = "ae2_meteorite_addon";
     public static final String NAME = "AE2 Meteorite Addon";
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.5";
 
     @Mod.Instance(MODID)
     public static AE2MeteoriteAddon INSTANCE;

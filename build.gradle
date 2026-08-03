@@ -14,7 +14,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.4'
+version = '1.5'
 group = 'com.ae2_meteorite_addon'
 archivesBaseName = 'ae2_meteorite_addon'
 
