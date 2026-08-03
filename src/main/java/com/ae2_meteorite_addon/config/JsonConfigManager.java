@@ -4,6 +4,9 @@ import com.ae2_meteorite_addon.AE2MeteoriteAddon;
 import com.ae2_meteorite_addon.block.BlockBudGeneric;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -49,8 +52,7 @@ public class JsonConfigManager {
 
         buddingEntries = loadJson(new File(subDir, "budding.json"),
                 new TypeToken<List<BuddingEntry>>(){}.getType(), getDefaultBuddingJson());
-        spawnEntries = loadJson(new File(subDir, "spawn.json"),
-                new TypeToken<List<SpawnEntry>>(){}.getType(), getDefaultSpawnJson());
+        spawnEntries = loadSpawnJson(new File(subDir, "spawn.json"), getDefaultSpawnJson());
         degenerateEntries = loadJson(new File(subDir, "degenerate.json"),
                 new TypeToken<List<DegenerateEntry>>(){}.getType(), getDefaultDegenerateJson());
         dropEntries = loadJson(new File(subDir, "drop.json"),
@@ -70,6 +72,50 @@ public class JsonConfigManager {
         try (FileReader reader = new FileReader(file)) {
             List<T> result = GSON.fromJson(reader, type);
             return result != null ? result : new ArrayList<>();
+        } catch (Exception e) {
+            LOGGER.error("Failed to parse config: {}", file.getName(), e);
+            return new ArrayList<>();
+        }
+    }
+
+    private static List<SpawnEntry> loadSpawnJson(File file, String defaultJson) {
+        if (!file.exists()) {
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write(defaultJson);
+            } catch (IOException e) {
+                LOGGER.error("Failed to write default config: {}", file.getName(), e);
+            }
+        }
+
+        try (FileReader reader = new FileReader(file)) {
+            JsonElement root = new JsonParser().parse(reader);
+            if (!root.isJsonArray()) {
+                throw new IllegalStateException("spawn.json must contain an array");
+            }
+
+            List<SpawnEntry> result = new ArrayList<>();
+            int index = 0;
+            for (JsonElement element : root.getAsJsonArray()) {
+                if (!element.isJsonObject()) {
+                    LOGGER.warn("Skipping spawn.json entry {} because it is not an object", index);
+                    index++;
+                    continue;
+                }
+
+                JsonObject object = element.getAsJsonObject();
+                if (object.has("acceleratable")) {
+                    LOGGER.warn("Skipping spawn.json entry {} because it contains the removed 'acceleratable' field", index);
+                    index++;
+                    continue;
+                }
+
+                SpawnEntry entry = GSON.fromJson(object, SpawnEntry.class);
+                if (entry != null) {
+                    result.add(entry);
+                }
+                index++;
+            }
+            return result;
         } catch (Exception e) {
             LOGGER.error("Failed to parse config: {}", file.getName(), e);
             return new ArrayList<>();
@@ -283,22 +329,6 @@ public class JsonConfigManager {
     }
 
     /**
-     * Get all acceleratable budding blocks
-     */
-    public static Set<Block> getAcceleratableBuddingBlocks() {
-        Set<Block> result = new HashSet<>();
-        for (SpawnEntry spawn : spawnEntries) {
-            if (spawn.acceleratable) {
-                Block block = buddingBlockMap.get(spawn.buddingBlock);
-                if (block != null) {
-                    result.add(block);
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
      * Get the drop for a bud block. Checks drop.json first, then uses defaults.
      */
     public static ItemStack getBudDrop(BlockBudGeneric budBlock, int fortune) {
@@ -396,8 +426,7 @@ public class JsonConfigManager {
                 "      {\"bud\": \"ae2_meteorite_addon:certus_quartz_bud\", \"meta\": 3}\n" +
                 "    ],\n" +
                 "    \"growChance\": 0.2,\n" +
-                "    \"spawnInMeteorite\": true,\n" +
-                "    \"acceleratable\": true\n" +
+                "    \"spawnInMeteorite\": true\n" +
                 "  }\n" +
                 "]\n";
     }
